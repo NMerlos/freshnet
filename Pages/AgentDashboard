@@ -1,0 +1,166 @@
+import React, { useState, useEffect } from "react";
+import { Conversation, Order, Product, WhatsAppAgent } from "@/entities/all";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { 
+  Bot, 
+  MessageCircle, 
+  TrendingUp, 
+  Brain,
+  Zap,
+  Target,
+  Clock,
+  CheckCircle,
+  AlertTriangle,
+  Users,
+  DollarSign
+} from "lucide-react";
+import AgentStatsCard from "../components/agent/AgentStatsCard";
+import LiveConversations from "../components/agent/LiveConversations";
+import AgentInsights from "../components/agent/AgentInsights";
+import AgentControls from "../components/agent/AgentControls";
+
+export default function AgentDashboard() {
+  const [conversations, setConversations] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [agent, setAgent] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    setIsLoading(true);
+    try {
+      const [conversationsData, ordersData, agentData] = await Promise.all([
+        Conversation.list("-created_date", 50),
+        Order.list("-created_date", 100),
+        WhatsAppAgent.list()
+      ]);
+      
+      setConversations(conversationsData);
+      setOrders(ordersData);
+      setAgent(agentData[0] || null);
+    } catch (error) {
+      console.error("Error loading dashboard data:", error);
+    }
+    setIsLoading(false);
+  };
+
+  // Calculate AI performance metrics
+  const activeConversations = conversations.filter(c => c.status === 'active');
+  const completedConversations = conversations.filter(c => c.status === 'completed');
+  const escalatedConversations = conversations.filter(c => c.status === 'requires_human');
+  
+  const todaysOrders = orders.filter(order => {
+    const orderDate = new Date(order.created_date);
+    const today = new Date();
+    return orderDate.toDateString() === today.toDateString();
+  });
+
+  const aiGeneratedOrders = todaysOrders.filter(order => order.ai_generated);
+  const conversionRate = conversations.length > 0 ? (completedConversations.length / conversations.length * 100) : 0;
+  const autonomyRate = conversations.length > 0 ? ((conversations.length - escalatedConversations.length) / conversations.length * 100) : 0;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-green-50 p-4 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="text-center lg:text-left">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <Brain className="w-10 h-10 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
+                AI Agent Dashboard
+              </h1>
+              <p className="text-lg text-gray-600">
+                {agent?.agent_name || "Lorenzo's AI Assistant"} is handling your WhatsApp conversations
+              </p>
+            </div>
+          </div>
+          
+          {agent && (
+            <div className="flex items-center gap-3 mb-4">
+              <Badge className={`${agent.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'} px-3 py-1`}>
+                <div className={`w-2 h-2 rounded-full mr-2 ${agent.is_active ? 'bg-green-500' : 'bg-gray-400'}`} />
+                {agent.is_active ? 'Active' : 'Inactive'}
+              </Badge>
+              <Badge variant="outline" className="px-3 py-1">
+                <Zap className="w-3 h-3 mr-1" />
+                {autonomyRate.toFixed(0)}% Autonomous
+              </Badge>
+              <Badge variant="outline" className="px-3 py-1">
+                <Target className="w-3 h-3 mr-1" />
+                {conversionRate.toFixed(0)}% Conversion
+              </Badge>
+            </div>
+          )}
+        </div>
+
+        {/* AI Performance Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+          <AgentStatsCard
+            title="Active Chats"
+            value={activeConversations.length}
+            icon={MessageCircle}
+            color="bg-blue-500"
+            trend={`${activeConversations.length > 5 ? '+' : ''}${activeConversations.length - 3}`}
+            description="Conversations in progress"
+          />
+          <AgentStatsCard
+            title="AI Orders Today"
+            value={aiGeneratedOrders.length}
+            icon={Bot}
+            color="bg-purple-500"
+            trend={`${aiGeneratedOrders.length > 2 ? '+' : ''}${aiGeneratedOrders.length - 1}`}
+            description="Orders created by AI"
+          />
+          <AgentStatsCard
+            title="Autonomy Rate"
+            value={`${autonomyRate.toFixed(0)}%`}
+            icon={Zap}
+            color="bg-emerald-500"
+            trend={autonomyRate > 80 ? 'Excellent' : autonomyRate > 60 ? 'Good' : 'Needs Training'}
+            description="Handled without human"
+          />
+          <AgentStatsCard
+            title="Need Review"
+            value={escalatedConversations.length}
+            icon={AlertTriangle}
+            color="bg-orange-500"
+            urgent={escalatedConversations.length > 3}
+            description="Escalated to human"
+          />
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
+          {/* Live Conversations - Takes 2 columns */}
+          <div className="lg:col-span-2">
+            <LiveConversations 
+              conversations={conversations} 
+              isLoading={isLoading}
+              onConversationUpdate={loadDashboardData}
+            />
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            <AgentControls 
+              agent={agent} 
+              onAgentUpdate={loadDashboardData}
+            />
+            <AgentInsights 
+              conversations={conversations}
+              orders={orders}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

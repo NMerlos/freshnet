@@ -1,0 +1,34 @@
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Bot, 
+  Play, 
+  Pause, 
+  Settings, 
+  Brain,
+  Zap,
+  Shield
+} from "lucide-react";
+import { WhatsAppAgent } from "@/entities/WhatsAppAgent";
+
+export default function AgentControls({ agent, onAgentUpdate }) {
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleToggleAgent = async () => {
+    if (!agent) return;
+    
+    setIsUpdating(true);
+    try {
+      await WhatsAppAgent.update(agent.id, {
+        is_active: !agent.is_active
+      });
+      onAgentUpdate();
+    } catch (error) {
+      console.error("Error updating agent:", error);
+    }
+    setIsUpdating(false);
+  };
+

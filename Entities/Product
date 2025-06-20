@@ -1,0 +1,60 @@
+{
+  "name": "Product",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Product name (e.g., Apples, Oranges)"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "fruits",
+        "vegetables",
+        "herbs",
+        "dried_fruits",
+        "organic"
+      ],
+      "description": "Product category"
+    },
+    "unit": {
+      "type": "string",
+      "enum": [
+        "kg",
+        "piece",
+        "box",
+        "crate",
+        "bunch"
+      ],
+      "description": "Unit of measurement"
+    },
+    "current_stock": {
+      "type": "number",
+      "description": "Current stock quantity"
+    },
+    "min_stock_alert": {
+      "type": "number",
+      "description": "Minimum stock level before alert"
+    },
+    "price_per_unit": {
+      "type": "number",
+      "description": "Price per unit"
+    },
+    "supplier": {
+      "type": "string",
+      "description": "Supplier name"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether product is actively sold"
+    }
+  },
+  "required": [
+    "name",
+    "category",
+    "unit",
+    "current_stock",
+    "price_per_unit"
+  ]
+}

@@ -1,0 +1,67 @@
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { 
+  Plus, 
+  MessageSquare, 
+  Settings, 
+  BarChart3,
+  Package,
+  ShoppingCart
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+
+const quickActions = [
+  {
+    title: "Add Product",
+    icon: Plus,
+    color: "bg-emerald-500",
+    url: createPageUrl("Inventory") + "?action=add"
+  },
+  {
+    title: "View Orders",
+    icon: ShoppingCart,
+    color: "bg-blue-500",
+    url: createPageUrl("Orders")
+  },
+  {
+    title: "Inventory",
+    icon: Package,
+    color: "bg-orange-500",
+    url: createPageUrl("Inventory")
+  },
+  {
+    title: "Settings",
+    icon: Settings,
+    color: "bg-purple-500",
+    url: createPageUrl("Automation")
+  }
+];
+
+export default function QuickActions() {
+  return (
+    <Card className="bg-white/80 backdrop-blur-sm">
+      <CardHeader>
+        <CardTitle className="text-lg font-bold">Quick Actions</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-3">
+          {quickActions.map((action) => (
+            <Link key={action.title} to={action.url}>
+              <Button
+                variant="outline"
+                className="w-full h-20 flex flex-col items-center gap-2 hover:scale-105 transition-all duration-300 border-gray-200 hover:border-gray-300"
+              >
+                <div className={`p-2 rounded-lg ${action.color} bg-opacity-20`}>
+                  <action.icon className={`w-5 h-5 ${action.color.replace('bg-', 'text-')}`} />
+                </div>
+                <span className="text-sm font-medium text-gray-700">{action.title}</span>
+              </Button>
+            </Link>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

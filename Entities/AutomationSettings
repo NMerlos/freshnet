@@ -1,0 +1,48 @@
+{
+  "name": "AutomationSettings",
+  "type": "object",
+  "properties": {
+    "welcome_message": {
+      "type": "string",
+      "description": "Welcome message for new customers"
+    },
+    "business_hours_start": {
+      "type": "string",
+      "description": "Business start time (HH:mm format)"
+    },
+    "business_hours_end": {
+      "type": "string",
+      "description": "Business end time (HH:mm format)"
+    },
+    "out_of_hours_message": {
+      "type": "string",
+      "description": "Message for contacts outside business hours"
+    },
+    "auto_confirm_threshold": {
+      "type": "number",
+      "description": "Auto-confirm orders below this amount"
+    },
+    "require_review_above": {
+      "type": "number",
+      "description": "Orders above this amount need manual review"
+    },
+    "out_of_stock_message": {
+      "type": "string",
+      "description": "Message when product is out of stock"
+    },
+    "order_confirmation_message": {
+      "type": "string",
+      "description": "Message sent when order is confirmed"
+    },
+    "is_automation_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether automation is currently active"
+    }
+  },
+  "required": [
+    "welcome_message",
+    "business_hours_start",
+    "business_hours_end"
+  ]
+}

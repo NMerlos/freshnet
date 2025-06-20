@@ -1,0 +1,277 @@
+
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { 
+  Clock, 
+  CheckCircle, 
+  Package, 
+  Truck, 
+  AlertTriangle,
+  Phone,
+  MapPin,
+  DollarSign,
+  Calendar,
+  MoreHorizontal,
+  Eye,
+  MessageCircle
+} from "lucide-react";
+import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+const statusConfig = {
+  pending: { 
+    icon: Clock, 
+    color: "bg-yellow-100 text-yellow-700 border-yellow-200",
+    label: "Pending",
+    nextStatus: "confirmed"
+  },
+  confirmed: { 
+    icon: CheckCircle, 
+    color: "bg-blue-100 text-blue-700 border-blue-200",
+    label: "Confirmed",
+    nextStatus: "preparing"
+  },
+  preparing: { 
+    icon: Package, 
+    color: "bg-purple-100 text-purple-700 border-purple-200",
+    label: "Preparing",
+    nextStatus: "ready"
+  },
+  ready: { 
+    icon: Truck, 
+    color: "bg-green-100 text-green-700 border-green-200",
+    label: "Ready for Delivery",
+    nextStatus: "delivered"
+  },
+  delivered: { 
+    icon: CheckCircle, 
+    color: "bg-emerald-100 text-emerald-700 border-emerald-200",
+    label: "Delivered"
+  },
+  cancelled: { 
+    icon: AlertTriangle, 
+    color: "bg-red-100 text-red-700 border-red-200",
+    label: "Cancelled"
+  }
+};
+
+export default function OrderCard({ order, onUpdate }) {
+  const navigate = useNavigate();
+  const [showDetails, setShowDetails] = useState(false);
+  const status = statusConfig[order.status] || statusConfig.pending;
+  const StatusIcon = status.icon;
+
+  const handleStatusUpdate = (newStatus) => {
+    onUpdate(order.id, { status: newStatus });
+  };
+
+  const handleReviewUpdate = (needsReview) => {
+    onUpdate(order.id, { needs_review: needsReview });
+  };
+
+  const openConversationReview = () => {
+    navigate(createPageUrl(`ConversationReview?orderId=${order.id}`));
+  };
+
+  return (
+    <>
+      <Card className={`transition-all duration-300 hover:shadow-lg ${
+        order.needs_review ? 'border-red-200 bg-red-50/50' : 'bg-white/80 backdrop-blur-sm border-gray-200'
+      }`}>
+        <CardHeader className="pb-4">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-full flex items-center justify-center">
+                <Phone className="w-6 h-6 text-emerald-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">{order.customer_name}</h3>
+                <p className="text-sm text-gray-500">{order.customer_phone}</p>
+                <p className="text-xs text-gray-400">
+                  {format(new Date(order.created_date), "MMM d, yyyy 'at' h:mm a")}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {order.needs_review && (
+                <Badge className="bg-red-100 text-red-700 border-red-200">
+                  <AlertTriangle className="w-3 h-3 mr-1" />
+                  Needs Review
+                </Badge>
+              )}
+              <Badge className={`${status.color} border`}>
+                <StatusIcon className="w-3 h-3 mr-1" />
+                {status.label}
+              </Badge>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setShowDetails(true)}>
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Details
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={openConversationReview}>
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    Review Conversation
+                  </DropdownMenuItem>
+                  {status.nextStatus && (
+                    <DropdownMenuItem onClick={() => handleStatusUpdate(status.nextStatus)}>
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Mark as {statusConfig[status.nextStatus]?.label}
+                    </DropdownMenuItem>
+                  )}
+                  {order.needs_review && (
+                    <DropdownMenuItem onClick={() => handleReviewUpdate(false)}>
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Approve Order
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={() => handleStatusUpdate('cancelled')}>
+                    <AlertTriangle className="w-4 h-4 mr-2" />
+                    Cancel Order
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </CardHeader>
+        
+        <CardContent>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-gray-400" />
+              <span className="text-sm text-gray-600">Total:</span>
+              <span className="font-semibold">${order.total_amount?.toFixed(2)}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Package className="w-4 h-4 text-gray-400" />
+              <span className="text-sm text-gray-600">Items:</span>
+              <span className="font-semibold">{order.order_items?.length || 0}</span>
+            </div>
+            {order.delivery_date && (
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-gray-400" />
+                <span className="text-sm text-gray-600">Delivery:</span>
+                <span className="font-semibold">{format(new Date(order.delivery_date), "MMM d")}</span>
+              </div>
+            )}
+            {order.delivery_address && (
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-gray-400" />
+                <span className="text-sm text-gray-600 truncate">{order.delivery_address}</span>
+              </div>
+            )}
+          </div>
+          
+          {order.review_reason && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 flex items-start justify-between gap-2">
+              <p className="text-sm text-red-700 flex-1">
+                <strong>Review Reason:</strong> {order.review_reason}
+              </p>
+              <Button variant="outline" size="sm" className="bg-white" onClick={openConversationReview}>
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Review
+              </Button>
+            </div>
+          )}
+          
+          <div className="flex flex-wrap gap-2">
+            {order.order_items?.slice(0, 3).map((item, index) => (
+              <Badge key={index} variant="outline" className="text-xs">
+                {item.quantity} {item.unit} {item.product_name}
+              </Badge>
+            ))}
+            {order.order_items?.length > 3 && (
+              <Badge variant="outline" className="text-xs">
+                +{order.order_items.length - 3} more
+              </Badge>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Order Details Dialog */}
+      <Dialog open={showDetails} onOpenChange={setShowDetails}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Order Details - {order.customer_name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">Customer</p>
+                <p className="font-semibold">{order.customer_name}</p>
+                <p className="text-sm text-gray-600">{order.customer_phone}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Order Date</p>
+                <p className="font-semibold">
+                  {format(new Date(order.created_date), "MMM d, yyyy 'at' h:mm a")}
+                </p>
+              </div>
+            </div>
+            
+            {order.delivery_address && (
+              <div>
+                <p className="text-sm text-gray-500">Delivery Address</p>
+                <p className="font-semibold">{order.delivery_address}</p>
+              </div>
+            )}
+            
+            <div>
+              <p className="text-sm text-gray-500 mb-2">Order Items</p>
+              <div className="space-y-2">
+                {order.order_items?.map((item, index) => (
+                  <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="font-medium">{item.product_name}</p>
+                      <p className="text-sm text-gray-600">
+                        {item.quantity} {item.unit} × ${item.unit_price?.toFixed(2)}
+                      </p>
+                    </div>
+                    <p className="font-semibold">${item.total_price?.toFixed(2)}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="border-t pt-4">
+              <div className="flex justify-between items-center text-lg font-bold">
+                <span>Total Amount</span>
+                <span>${order.total_amount?.toFixed(2)}</span>
+              </div>
+            </div>
+            
+            {order.notes && (
+              <div>
+                <p className="text-sm text-gray-500">Notes</p>
+                <p className="text-sm">{order.notes}</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}

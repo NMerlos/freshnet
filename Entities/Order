@@ -1,0 +1,125 @@
+{
+  "name": "Order",
+  "type": "object",
+  "properties": {
+    "customer_name": {
+      "type": "string",
+      "description": "Customer name"
+    },
+    "customer_phone": {
+      "type": "string",
+      "description": "Customer WhatsApp number"
+    },
+    "order_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "product_name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "unit_price": {
+            "type": "number"
+          },
+          "total_price": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "Items in the order"
+    },
+    "total_amount": {
+      "type": "number",
+      "description": "Total order amount"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "confirmed",
+        "preparing",
+        "ready",
+        "delivered",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "Order status"
+    },
+    "needs_review": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether order needs manual review"
+    },
+    "review_reason": {
+      "type": "string",
+      "description": "Reason why order needs review"
+    },
+    "conversation_transcript": {
+      "type": "array",
+      "description": "Full conversation transcript",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sender": {
+            "type": "string",
+            "enum": [
+              "customer",
+              "bot",
+              "agent",
+              "human"
+            ]
+          },
+          "text": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ai_confidence": {
+            "type": "number",
+            "description": "AI confidence in understanding (0-1)"
+          },
+          "intent": {
+            "type": "string",
+            "description": "Detected customer intent"
+          }
+        }
+      }
+    },
+    "ai_generated": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this order was created by AI agent"
+    },
+    "ai_confidence_score": {
+      "type": "number",
+      "description": "AI confidence in order accuracy (0-1)"
+    },
+    "delivery_address": {
+      "type": "string",
+      "description": "Delivery address"
+    },
+    "delivery_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Requested delivery date"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional order notes"
+    }
+  },
+  "required": [
+    "customer_name",
+    "customer_phone",
+    "order_items",
+    "total_amount"
+  ]
+}

@@ -1,0 +1,34 @@
+import React from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
+
+export default function AgentStatsCard({ 
+  title, 
+  value, 
+  icon: Icon, 
+  color, 
+  trend, 
+  description,
+  urgent = false 
+}) {
+  const isPositiveTrend = trend && (trend.startsWith('+') || trend === 'Excellent' || trend === 'Good');
+  
+  return (
+    <Card className={`relative overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl ${
+      urgent ? 'ring-2 ring-orange-200 bg-orange-50' : 'bg-white/80 backdrop-blur-sm'
+    }`}>
+      <div className={`absolute top-0 right-0 w-24 h-24 ${color} opacity-10 rounded-full transform translate-x-8 -translate-y-8`} />
+      
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
+            <p className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{value}</p>
+            <p className="text-xs text-gray-500 mb-2">{description}</p>
+            
+            {trend && (
+              <div className="flex items-center gap-1">
+                {trend.startsWith('+') || trend.startsWith('-') ? (
+                  <>
+                    {isPositiveTrend ? (

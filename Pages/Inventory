@@ -1,0 +1,199 @@
+import React, { useState, useEffect } from "react";
+import { Product } from "@/entities/Product";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Plus, 
+  Search, 
+  Package, 
+  AlertTriangle,
+  Apple,
+  Carrot,
+  Leaf,
+  Filter
+} from "lucide-react";
+import ProductCard from "../components/inventory/ProductCard";
+import AddProductDialog from "../components/inventory/AddProductDialog";
+
+const categoryTabs = [
+  { value: "all", label: "All Items", icon: Package },
+  { value: "fruits", label: "Fruits", icon: Apple },
+  { value: "vegetables", label: "Vegetables", icon: Carrot },
+  { value: "herbs", label: "Herbs", icon: Leaf },
+  { value: "low_stock", label: "Low Stock", icon: AlertTriangle }
+];
+
+export default function Inventory() {
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showAddDialog, setShowAddDialog] = useState(false);
+
+  useEffect(() => {
+    loadProducts();
+    
+    // Check for query params to open dialog
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('action') === 'add') {
+      setShowAddDialog(true);
+    }
+  }, []);
+
+  const loadProducts = async () => {
+    setIsLoading(true);
+    try {
+      const data = await Product.list();
+      setProducts(data);
+    } catch (error) {
+      console.error("Error loading products:", error);
+    }
+    setIsLoading(false);
+  };
+
+  const handleAddProduct = async (productData) => {
+    try {
+      await Product.create(productData);
+      await loadProducts();
+      setShowAddDialog(false);
+    } catch (error) {
+      console.error("Error adding product:", error);
+    }
+  };
+
+  const handleUpdateProduct = async (productId, updates) => {
+    try {
+      await Product.update(productId, updates);
+      await loadProducts();
+    } catch (error) {
+      console.error("Error updating product:", error);
+    }
+  };
+
+  // Filter products based on active tab and search
+  const filteredProducts = products.filter(product => {
+    const matchesTab = activeTab === "all" || 
+                      (activeTab === "low_stock" && product.current_stock <= (product.min_stock_alert || 10)) ||
+                      (activeTab !== "low_stock" && product.category === activeTab);
+    
+    const matchesSearch = !searchQuery || 
+                         product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         product.supplier?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return matchesTab && matchesSearch;
+  });
+
+  const getTabCount = (tabValue) => {
+    if (tabValue === "all") return products.length;
+    if (tabValue === "low_stock") return products.filter(p => p.current_stock <= (p.min_stock_alert || 10)).length;
+    return products.filter(p => p.category === tabValue).length;
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-green-50 p-4 lg:p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Inventory</h1>
+            <p className="text-lg text-gray-600">Manage your produce stock levels</p>
+          </div>
+          <Button 
+            onClick={() => setShowAddDialog(true)}
+            className="bg-emerald-600 hover:bg-emerald-700 h-12 px-6"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Add Product
+          </Button>
+        </div>
+
+        {/* Search */}
+        <Card className="p-6 mb-6 bg-white/80 backdrop-blur-sm">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Input
+              placeholder="Search products by name or supplier..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 h-12 text-lg"
+            />
+          </div>
+        </Card>
+
+        {/* Category Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5 h-auto p-1 bg-white/80 backdrop-blur-sm">
+            {categoryTabs.map((tab) => {
+              const TabIcon = tab.icon;
+              const count = getTabCount(tab.value);
+              
+              return (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className="flex flex-col lg:flex-row items-center gap-2 p-4 data-[state=active]:bg-emerald-100 data-[state=active]:text-emerald-700"
+                >
+                  <TabIcon className="w-5 h-5" />
+                  <div className="text-center lg:text-left">
+                    <div className="font-medium">{tab.label}</div>
+                    <Badge variant="secondary" className="mt-1 lg:ml-2 lg:mt-0">
+                      {count}
+                    </Badge>
+                  </div>
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+
+          {categoryTabs.map((tab) => (
+            <TabsContent key={tab.value} value={tab.value}>
+              {isLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {Array(6).fill(0).map((_, i) => (
+                    <Card key={i} className="p-6 animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+                    </Card>
+                  ))}
+                </div>
+              ) : filteredProducts.length === 0 ? (
+                <Card className="p-12 text-center bg-white/80 backdrop-blur-sm">
+                  <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-600 mb-2">No Products Found</h3>
+                  <p className="text-gray-500 mb-6">
+                    {searchQuery ? "Try adjusting your search terms" : "Add your first product to get started"}
+                  </p>
+                  <Button onClick={() => setShowAddDialog(true)} className="bg-emerald-600 hover:bg-emerald-700">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Product
+                  </Button>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onUpdate={handleUpdateProduct}
+                    />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          ))}
+        </Tabs>
+
+        {/* Add Product Dialog */}
+        <AddProductDialog
+          open={showAddDialog}
+          onClose={() => setShowAddDialog(false)}
+          onAdd={handleAddProduct}
+        />
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,118 @@
+
+import React, { useState, useEffect } from "react";
+import { Product, Order } from "@/entities/all";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { 
+  ShoppingCart, 
+  Package, 
+  TrendingUp, 
+  AlertTriangle,
+  Clock,
+  CheckCircle,
+  DollarSign
+} from "lucide-react";
+import { format } from "date-fns";
+import StatsCard from "../components/dashboard/StatsCard";
+import RecentOrders from "../components/dashboard/RecentOrders";
+import LowStockAlert from "../components/dashboard/LowStockAlert";
+import QuickActions from "../components/dashboard/QuickActions";
+
+export default function Dashboard() {
+  const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const [ordersData, productsData] = await Promise.all([
+        Order.list("-created_date", 50),
+        Product.list()
+      ]);
+      setOrders(ordersData);
+      setProducts(productsData);
+    } catch (error) {
+      console.error("Error loading dashboard data:", error);
+    }
+    setIsLoading(false);
+  };
+
+  // Calculate stats
+  const todaysOrders = orders.filter(order => {
+    const orderDate = new Date(order.created_date);
+    const today = new Date();
+    return orderDate.toDateString() === today.toDateString();
+  });
+
+  const pendingOrders = orders.filter(order => order.status === 'pending');
+  const ordersNeedingReview = orders.filter(order => order.needs_review);
+  const todaysRevenue = todaysOrders.reduce((sum, order) => sum + (order.total_amount || 0), 0);
+  const lowStockProducts = products.filter(product => 
+    product.current_stock <= (product.min_stock_alert || 10)
+  );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-green-50 p-4 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="text-center lg:text-left">
+          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+            Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 17 ? 'Afternoon' : 'Evening'}, Lorenzo! 
+          </h1>
+          <p className="text-lg text-gray-600">Here's what's happening with your business today</p>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+          <StatsCard
+            title="Today's Orders"
+            value={todaysOrders.length}
+            icon={ShoppingCart}
+            color="bg-emerald-500"
+            trend={`+${Math.round(((todaysOrders.length - 5) / 5) * 100)}%`}
+          />
+          <StatsCard
+            title="Today's Revenue"
+            value={`$${todaysRevenue.toFixed(0)}`}
+            icon={DollarSign}
+            color="bg-blue-500"
+            trend={`+${Math.round(((todaysRevenue - 500) / 500) * 100)}%`}
+          />
+          <StatsCard
+            title="Pending Orders"
+            value={pendingOrders.length}
+            icon={Clock}
+            color="bg-orange-500"
+            urgent={pendingOrders.length > 5}
+          />
+          <StatsCard
+            title="Need Review"
+            value={ordersNeedingReview.length}
+            icon={AlertTriangle}
+            color="bg-red-500"
+            urgent={ordersNeedingReview.length > 0}
+          />
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
+          {/* Recent Orders - Takes 2 columns on desktop */}
+          <div className="lg:col-span-2">
+            <RecentOrders orders={orders.slice(0, 10)} isLoading={isLoading} />
+          </div>
+
+          {/* Sidebar Content */}
+          <div className="space-y-6">
+            <QuickActions />
+            <LowStockAlert products={lowStockProducts} isLoading={isLoading} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,62 @@
+{
+  "name": "AIDecision",
+  "type": "object",
+  "properties": {
+    "conversation_id": {
+      "type": "string",
+      "description": "Related conversation ID"
+    },
+    "decision_type": {
+      "type": "string",
+      "enum": [
+        "product_recommendation",
+        "order_modification",
+        "pricing_decision",
+        "escalation",
+        "order_completion"
+      ],
+      "description": "Type of decision made"
+    },
+    "input_data": {
+      "type": "object",
+      "description": "Data used to make the decision"
+    },
+    "decision_result": {
+      "type": "object",
+      "description": "The actual decision made"
+    },
+    "confidence_score": {
+      "type": "number",
+      "description": "AI confidence in the decision (0-1)"
+    },
+    "reasoning": {
+      "type": "string",
+      "description": "AI's explanation of why it made this decision"
+    },
+    "was_correct": {
+      "type": "boolean",
+      "description": "Whether the decision was validated as correct (for learning)"
+    },
+    "human_feedback": {
+      "type": "string",
+      "description": "Human feedback on the decision quality"
+    },
+    "execution_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "executed",
+        "failed",
+        "overridden"
+      ],
+      "default": "pending",
+      "description": "Status of decision execution"
+    }
+  },
+  "required": [
+    "conversation_id",
+    "decision_type",
+    "decision_result",
+    "confidence_score"
+  ]
+}

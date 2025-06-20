@@ -1,0 +1,106 @@
+{
+  "name": "Conversation",
+  "type": "object",
+  "properties": {
+    "customer_phone": {
+      "type": "string",
+      "description": "Customer's WhatsApp number"
+    },
+    "customer_name": {
+      "type": "string",
+      "description": "Customer's name (extracted by AI)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "completed",
+        "requires_human",
+        "archived"
+      ],
+      "default": "active",
+      "description": "Conversation status"
+    },
+    "messages": {
+      "type": "array",
+      "description": "All messages in the conversation",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sender": {
+            "type": "string",
+            "enum": [
+              "customer",
+              "agent",
+              "human"
+            ]
+          },
+          "text": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ai_confidence": {
+            "type": "number",
+            "description": "AI confidence in understanding (0-1)"
+          },
+          "intent": {
+            "type": "string",
+            "description": "Detected customer intent"
+          },
+          "entities_extracted": {
+            "type": "object",
+            "description": "Products, quantities, etc. extracted by AI"
+          }
+        }
+      }
+    },
+    "customer_context": {
+      "type": "object",
+      "description": "AI's understanding of customer preferences, history, etc.",
+      "properties": {
+        "is_returning_customer": {
+          "type": "boolean"
+        },
+        "preferred_products": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dietary_preferences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "delivery_address": {
+          "type": "string"
+        },
+        "typical_order_size": {
+          "type": "string"
+        },
+        "communication_style": {
+          "type": "string"
+        }
+      }
+    },
+    "active_order_id": {
+      "type": "string",
+      "description": "ID of order being built in this conversation"
+    },
+    "escalation_reason": {
+      "type": "string",
+      "description": "Why this conversation was escalated to human"
+    },
+    "ai_notes": {
+      "type": "string",
+      "description": "AI's internal notes about the conversation"
+    }
+  },
+  "required": [
+    "customer_phone"
+  ]
+}
