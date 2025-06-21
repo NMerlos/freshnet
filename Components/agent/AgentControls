@@ -32,3 +32,122 @@ export default function AgentControls({ agent, onAgentUpdate }) {
     setIsUpdating(false);
   };
 
+  const handleTrainAgent = async () => {
+    setIsUpdating(true);
+    try {
+      // Simulate training process
+      if (agent) {
+        await WhatsAppAgent.update(agent.id, {
+          last_trained: new Date().toISOString()
+        });
+      }
+      onAgentUpdate();
+    } catch (error) {
+      console.error("Error training agent:", error);
+    }
+    setIsUpdating(false);
+  };
+
+  return (
+    <Card className="bg-white/80 backdrop-blur-sm">
+      <CardHeader>
+        <CardTitle className="text-lg font-bold flex items-center gap-2">
+          <Bot className="w-5 h-5" />
+          Panel de control de Lorenzo
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Agent Status */}
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium text-gray-900"> Estado de Lorenzo</p>
+            <p className="text-sm text-gray-500">
+              {agent?.is_active ? 'Lorenzo está respondiendo mensajes' : 'Lorenzo está en modo pausa'}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Badge className={agent?.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}>
+              {agent?.is_active ? 'Activo' : 'Pausado'}
+            </Badge>
+            <Switch
+              checked={agent?.is_active || false}
+              onCheckedChange={handleToggleAgent}
+              disabled={isUpdating}
+            />
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="space-y-3">
+          <Button 
+            onClick={handleTrainAgent}
+            disabled={isUpdating}
+            className="w-full bg-purple-600 hover:bg-purple-700"
+          >
+            <Brain className="w-4 h-4 mr-2" />
+            {isUpdating ? 'Entrenando...' : 'Entrenar a Lorenzo'}
+          </Button>
+          
+          <Button variant="outline" className="w-full">
+            <Settings className="w-4 h-4 mr-2" />
+            Ajustes Avanzados
+          </Button>
+        </div>
+
+        {/* Agent Info */}
+        {agent && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">Autonomía de Lorenzo</span>
+              <Badge variant="outline">
+                {Math.round((agent.decision_threshold || 0.8) * 100)}%
+              </Badge>
+            </div>
+            
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">Importe máximo del pedido</span>
+              <Badge variant="outline">
+                €{agent.max_order_value || 500}
+              </Badge>
+            </div>
+            
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">Último entrenamiento</span>
+              <Badge variant="outline">
+                {agent.last_trained ? 
+                  new Date(agent.last_trained).toLocaleDateString() : 
+                  'Never'
+                }
+              </Badge>
+            </div>
+          </div>
+        )}
+
+        {/* Performance Indicators */}
+        <div className="pt-4 border-t border-gray-200">
+          <p className="text-sm font-medium text-gray-700 mb-3">Rendimiento</p>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="text-center">
+              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-1">
+                <Zap className="w-4 h-4 text-green-600" />
+              </div>
+              <p className="text-xs text-gray-600">Inteligente</p>
+            </div>
+            <div className="text-center">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-1">
+                <Shield className="w-4 h-4 text-blue-600" />
+              </div>
+              <p className="text-xs text-gray-600">Seguro</p>
+            </div>
+            <div className="text-center">
+              <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-1">
+                <Brain className="w-4 h-4 text-purple-600" />
+              </div>
+              <p className="text-xs text-gray-600">Aprendiendo</p>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

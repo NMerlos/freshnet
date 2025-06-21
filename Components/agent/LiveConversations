@@ -22,13 +22,150 @@ const statusConfig = {
   active: { 
     icon: MessageCircle, 
     color: "bg-blue-100 text-blue-700 border-blue-200",
-    label: "Active Chat"
+    label: "Chats Activos"
   },
   completed: { 
     icon: CheckCircle, 
     color: "bg-green-100 text-green-700 border-green-200",
-    label: "Completed"
+    label: "Completada"
   },
   requires_human: { 
     icon: AlertTriangle, 
     color: "bg-red-100 text-red-700 border-red-200",
+    label: "Lorenzo necesita ayuda humana"
+  },
+  archived: { 
+    icon: Clock, 
+    color: "bg-gray-100 text-gray-700 border-gray-200",
+    label: "Archivados"
+  }
+};
+
+export default function LiveConversations({ conversations, isLoading, onConversationUpdate }) {  
+  if (isLoading) {
+    return (
+      <Card className="bg-white/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold">Conversaciones activas</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {Array(4).fill(0).map((_, i) => (
+              <div key={i} className="flex items-center gap-4">
+                <Skeleton className="w-12 h-12 rounded-full" />
+                <div className="flex-1">
+                  <Skeleton className="h-4 w-32 mb-2" />
+                  <Skeleton className="h-3 w-48" />
+                </div>
+                <Skeleton className="h-6 w-20 rounded-full" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="bg-white/80 backdrop-blur-sm">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="text-xl font-bold flex items-center gap-2">
+          <Brain className="w-5 h-5 text-purple-600" />
+          Conversaciones actuales de Lorenzo
+        </CardTitle>
+        <Badge variant="outline" className="text-purple-600 border-purple-200">
+          {conversations.filter(c => c.status === 'active').length} Active
+        </Badge>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {conversations.length === 0 ? (
+            <div className="text-center py-8">
+              <Bot className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500">No conversations yet</p>
+              <p className="text-sm text-gray-400">AI will start handling messages automatically</p>
+            </div>
+          ) : (
+            conversations.slice(0, 8).map((conversation) => {
+              const status = statusConfig[conversation.status] || statusConfig.active;
+              const StatusIcon = status.icon;
+              const lastMessage = conversation.messages?.[conversation.messages.length - 1];
+              const aiConfidence = lastMessage?.ai_confidence || 0;
+              
+              return (
+                <div key={conversation.id} className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 rounded-full flex items-center justify-center">
+                    <User className="w-6 h-6 text-purple-600" />
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="font-semibold text-gray-900 truncate">
+                        {conversation.customer_name || 'Unknown Customer'}
+                      </p>
+                      {conversation.status === 'requires_human' && (
+                        <Badge className="bg-red-100 text-red-600 border-red-200 text-xs">
+                          <AlertTriangle className="w-3 h-3 mr-1" />
+                          Revisar conversación
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    <p className="text-sm text-gray-500 truncate mb-1">
+                      {conversation.customer_phone}
+                    </p>
+                    
+                    {lastMessage && (
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs text-gray-400 truncate flex-1">
+                          {lastMessage.text.length > 50 ? 
+                            `${lastMessage.text.substring(0, 50)}...` : 
+                            lastMessage.text
+                          }
+                        </p>
+                        <div className="flex items-center gap-1">
+                          <Zap className="w-3 h-3 text-purple-500" />
+                          <span className="text-xs text-purple-600 font-medium">
+                            {Math.round(aiConfidence * 100)}%
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <p className="text-xs text-gray-400 mt-1">
+                      {conversation.messages?.filter(m => m.sender === 'agent').length || 0} AI responses • 
+                      Last: {lastMessage ? format(new Date(lastMessage.timestamp), "h:mm a") : 'N/A'}
+                    </p>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Badge className={`${status.color} border`}>
+                      <StatusIcon className="w-3 h-3 mr-1" />
+                      {status.label}
+                    </Badge>
+                    
+                    <Link to={createPageUrl(`ConversationReview?conversationId=${conversation.id}`)}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+        
+        {conversations.length > 8 && (
+          <div className="text-center pt-4">
+            <Link to={createPageUrl("Conversations")}>
+              <Button variant="outline">
+                Ver Todas Las Conversaciones ({conversations.length})
+              </Button>
+            </Link>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}

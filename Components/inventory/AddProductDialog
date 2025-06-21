@@ -12,19 +12,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus } from "lucide-react";
 
 const categories = [
-  { value: "fruits", label: "Fruits" },
-  { value: "vegetables", label: "Vegetables" },
-  { value: "herbs", label: "Herbs" },
-  { value: "dried_fruits", label: "Dried Fruits" },
-  { value: "organic", label: "Organic" }
+  { value: "fruits", label: "Fruta" },
+  { value: "vegetables", label: "Verdura" },
+  { value: "herbs", label: "Hierbas" },
+  { value: "dried_fruits", label: "Fruta deshidratada" },
+  { value: "organic", label: "Organico" }
 ];
 
 const units = [
-  { value: "kg", label: "Kilogram (kg)" },
-  { value: "piece", label: "Piece" },
-  { value: "box", label: "Box" },
-  { value: "crate", label: "Crate" },
-  { value: "bunch", label: "Bunch" }
+  { value: "kg", label: "Kilogramos (kg)" },
+  { value: "piece", label: "Unidades" },
+  { value: "box", label: "Cajas" },
+  { value: "crate", label: "Bandejas" },
+  { value: "bunch", label: "Manojos" }
 ];
 
 export default function AddProductDialog({ open, onClose, onAdd }) {

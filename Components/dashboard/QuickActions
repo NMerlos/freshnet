@@ -26,13 +26,13 @@ const quickActions = [
     url: createPageUrl("Orders")
   },
   {
-    title: "Inventory",
+    title: "Inventario",
     icon: Package,
     color: "bg-orange-500",
     url: createPageUrl("Inventory")
   },
   {
-    title: "Settings",
+    title: "Ajustes",
     icon: Settings,
     color: "bg-purple-500",
     url: createPageUrl("Automation")
@@ -43,7 +43,7 @@ export default function QuickActions() {
   return (
     <Card className="bg-white/80 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle className="text-lg font-bold">Quick Actions</CardTitle>
+        <CardTitle className="text-lg font-bold">Atajos</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-3">

@@ -29,7 +29,7 @@ import { Button } from "@/components/ui/button";
 
 const navigationItems = [
   {
-    title: "Dashboard",
+    title: "Vista general",
     url: createPageUrl("Dashboard"),
     icon: LayoutDashboard,
     color: "bg-emerald-500",

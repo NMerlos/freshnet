@@ -32,3 +32,33 @@ export default function AgentStatsCard({
                 {trend.startsWith('+') || trend.startsWith('-') ? (
                   <>
                     {isPositiveTrend ? (
+                      <TrendingUp className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <TrendingDown className="w-4 h-4 text-red-500" />
+                    )}
+                    <span className={`text-sm font-medium ${
+                      isPositiveTrend ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {trend}
+                    </span>
+                  </>
+                ) : (
+                  <Badge variant="outline" className={`text-xs ${
+                    trend === 'Excellent' ? 'text-green-600 border-green-200' :
+                    trend === 'Good' ? 'text-blue-600 border-blue-200' :
+                    'text-orange-600 border-orange-200'
+                  }`}>
+                    {trend}
+                  </Badge>
+                )}
+              </div>
+            )}
+          </div>
+          <div className={`p-3 rounded-xl ${color} bg-opacity-20`}>
+            <Icon className={`w-6 h-6 ${color.replace('bg-', 'text-')}`} />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

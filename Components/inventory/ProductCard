@@ -98,7 +98,7 @@ export default function ProductCard({ product, onUpdate }) {
       <CardContent className="space-y-4">
         {/* Stock Level */}
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">Current Stock</span>
+          <span className="text-sm text-gray-600">Stock actual</span>
           {isEditing ? (
             <div className="flex items-center gap-2">
               <Button 
@@ -133,7 +133,7 @@ export default function ProductCard({ product, onUpdate }) {
 
         {/* Price */}
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">Price per {product.unit}</span>
+          <span className="text-sm text-gray-600">Precio por {product.unit}</span>
           {isEditing ? (
             <div className="flex items-center gap-1">
               <DollarSign className="w-4 h-4 text-gray-400" />
@@ -154,7 +154,7 @@ export default function ProductCard({ product, onUpdate }) {
 
         {/* Minimum Stock Alert */}
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">Min Stock Alert</span>
+          <span className="text-sm text-gray-600">Alerta de bajo stock</span>
           {isEditing ? (
             <Input
               type="number"
@@ -172,7 +172,7 @@ export default function ProductCard({ product, onUpdate }) {
         {/* Supplier */}
         {product.supplier && (
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Supplier</span>
+            <span className="text-sm text-gray-600">Proveedor</span>
             <span className="text-sm text-gray-500">{product.supplier}</span>
           </div>
         )}

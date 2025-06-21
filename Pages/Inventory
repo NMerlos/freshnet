@@ -19,11 +19,11 @@ import ProductCard from "../components/inventory/ProductCard";
 import AddProductDialog from "../components/inventory/AddProductDialog";
 
 const categoryTabs = [
-  { value: "all", label: "All Items", icon: Package },
-  { value: "fruits", label: "Fruits", icon: Apple },
-  { value: "vegetables", label: "Vegetables", icon: Carrot },
-  { value: "herbs", label: "Herbs", icon: Leaf },
-  { value: "low_stock", label: "Low Stock", icon: AlertTriangle }
+  { value: "all", label: "Todos los productos", icon: Package },
+  { value: "fruits", label: "Fruta", icon: Apple },
+  { value: "vegetables", label: "Verdura", icon: Carrot },
+  { value: "herbs", label: "Hierbas", icon: Leaf },
+  { value: "low_stock", label: "Productos con bajo stock", icon: AlertTriangle }
 ];
 
 export default function Inventory() {
@@ -98,8 +98,8 @@ export default function Inventory() {
         {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Inventory</h1>
-            <p className="text-lg text-gray-600">Manage your produce stock levels</p>
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Inventario</h1>
+            <p className="text-lg text-gray-600">Revisa y actualiza lo que tienes en inventario</p>
           </div>
           <Button 
             onClick={() => setShowAddDialog(true)}
@@ -115,7 +115,7 @@ export default function Inventory() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
-              placeholder="Search products by name or supplier..."
+              placeholder="Busca los productos que necesitas por nombre o proveedor..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 h-12 text-lg"

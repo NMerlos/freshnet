@@ -62,36 +62,36 @@ export default function Dashboard() {
         {/* Header */}
         <div className="text-center lg:text-left">
           <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
-            Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 17 ? 'Afternoon' : 'Evening'}, Lorenzo! 
+            {new Date().getHours() < 12 ? 'Buenos Días' : new Date().getHours() < 17 ? 'Buenas Tardes' : 'Buenas Noches'}, Oriol! 
           </h1>
-          <p className="text-lg text-gray-600">Here's what's happening with your business today</p>
+          <p className="text-lg text-gray-600">Todo lo que pasa en tu negocio, en una sola pantalla</p>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           <StatsCard
-            title="Today's Orders"
+            title="Pedidos del día"
             value={todaysOrders.length}
             icon={ShoppingCart}
             color="bg-emerald-500"
             trend={`+${Math.round(((todaysOrders.length - 5) / 5) * 100)}%`}
           />
           <StatsCard
-            title="Today's Revenue"
+            title="Ventas del día"
             value={`$${todaysRevenue.toFixed(0)}`}
             icon={DollarSign}
             color="bg-blue-500"
             trend={`+${Math.round(((todaysRevenue - 500) / 500) * 100)}%`}
           />
           <StatsCard
-            title="Pending Orders"
+            title="Pedidos pendientes"
             value={pendingOrders.length}
             icon={Clock}
             color="bg-orange-500"
             urgent={pendingOrders.length > 5}
           />
           <StatsCard
-            title="Need Review"
+            title="PEDIDOS QUE NECESITAN REVISARSE"
             value={ordersNeedingReview.length}
             icon={AlertTriangle}
             color="bg-red-500"

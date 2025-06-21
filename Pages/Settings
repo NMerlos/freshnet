@@ -8,23 +8,23 @@ export default function Settings() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Settings</h1>
-          <p className="text-lg text-gray-600">Manage your application settings</p>
+          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Ajustes</h1>
+          <p className="text-lg text-gray-600">Ajusta las opciones de la aplicación</p>
         </div>
 
         <Card className="bg-white/80 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bot className="w-5 h-5" />
-              Automation Configuration
+              Ajustes de automatización
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center justify-center text-center p-12 bg-gray-50 rounded-lg">
                 <Construction className="h-16 w-16 text-gray-400 mb-4" />
-                <h3 className="text-xl font-semibold text-gray-700">Coming Soon!</h3>
+                <h3 className="text-xl font-semibold text-gray-700">¡Próximamente!</h3>
                 <p className="text-gray-500 mt-2 max-w-md">
-                    This is where you'll configure your WhatsApp agent's behavior, including message templates, business hours, and automated rules. This feature is currently under construction.
+                   Aquí podrás configurar cómo funciona tu agente de WhatsApp: los mensajes, el horario de atención y las reglas automáticas. Esta función está en construcción.
                 </p>
             </div>
           </CardContent>

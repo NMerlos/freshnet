@@ -75,10 +75,10 @@ export default function AgentDashboard() {
             </div>
             <div>
               <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
-                AI Agent Dashboard
+                Tu agente de IA
               </h1>
               <p className="text-lg text-gray-600">
-                {agent?.agent_name || "Lorenzo's AI Assistant"} is handling your WhatsApp conversations
+                {agent?.agent_name || "Lorenzo"} se encanrga de todas tus conversaciones
               </p>
             </div>
           </div>
@@ -104,36 +104,36 @@ export default function AgentDashboard() {
         {/* AI Performance Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           <AgentStatsCard
-            title="Active Chats"
+            title="Chats Activos"
             value={activeConversations.length}
             icon={MessageCircle}
             color="bg-blue-500"
             trend={`${activeConversations.length > 5 ? '+' : ''}${activeConversations.length - 3}`}
-            description="Conversations in progress"
+            description="Conversaciones en curso"
           />
           <AgentStatsCard
-            title="AI Orders Today"
+            title="Pedidos gestionados por Lorenzo"
             value={aiGeneratedOrders.length}
             icon={Bot}
             color="bg-purple-500"
             trend={`${aiGeneratedOrders.length > 2 ? '+' : ''}${aiGeneratedOrders.length - 1}`}
-            description="Orders created by AI"
+            description="Pedidos automatizados"
           />
           <AgentStatsCard
-            title="Autonomy Rate"
+            title="Tareas que Lorenzo ha hecho solo"
             value={`${autonomyRate.toFixed(0)}%`}
             icon={Zap}
             color="bg-emerald-500"
-            trend={autonomyRate > 80 ? 'Excellent' : autonomyRate > 60 ? 'Good' : 'Needs Training'}
-            description="Handled without human"
+            trend={autonomyRate > 80 ? 'Excelente' : autonomyRate > 60 ? 'Bueno' : 'Necesita entrenamiento'}
+            description="Pedidos gestionados automáticamente"
           />
           <AgentStatsCard
-            title="Need Review"
+            title="NECESITAN REVISIÓN"
             value={escalatedConversations.length}
             icon={AlertTriangle}
             color="bg-orange-500"
             urgent={escalatedConversations.length > 3}
-            description="Escalated to human"
+            description="Lorenzo lo ha derivado a una persona"
           />
         </div>
 

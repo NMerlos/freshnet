@@ -21,10 +21,10 @@
       "type": "string",
       "enum": [
         "kg",
-        "piece",
-        "box",
-        "crate",
-        "bunch"
+        "pieza",
+        "caja",
+        "bandeja",
+        "manojo"
       ],
       "description": "Unit of measurement"
     },
